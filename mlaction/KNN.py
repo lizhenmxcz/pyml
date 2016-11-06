@@ -19,6 +19,7 @@ def classify0(inx, dataset, labels, k):
     sqDiffMat = diffMat ** 2
     sqDistances = sqDiffMat.sum(axis=1)
     distances = sqDistances ** 0.5
+    #print(distances)
     sortedDistIndicies = distances.argsort()
     classCount = {}
     for i in range(k):
@@ -94,4 +95,20 @@ def datingClassTest():
         if classifierResult != datingLabels[i]:
             errorCount += 1.0
     print("the total error rate is：%f" % (errorCount/float(numTestVecs)))
-datingClassTest()
+
+
+def classifyPerson():
+    resultList = ["not at all", "in small doses", "in large doses"]
+    percentTats = float(input("percentage of time spent playing video games?"))
+    ffMiles = float(input("frequent filter miles earned per year?"))
+    iceCream = float(input("liters of ice cream consumed per year?"))
+    datingDataMat, datingLabels = file2matrix('datingTestSet2.txt')
+    normMat, ranges, minVal = autoNorm(datingDataMat)
+    inArr = np.array([ffMiles, percentTats, iceCream])
+    classifyResult = classify0((inArr - minVal)/ranges, normMat, datingLabels, 3)
+    print("You will probably like this person", resultList[classifyResult-1])
+
+classifyPerson()
+
+
+
