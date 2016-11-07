@@ -5,6 +5,7 @@
 from math import log
 import operator
 
+
 def createDataSet():
     dataSet = [[1, 1, 'yes'], [1, 1, 'yes'], [1, 0, 'no'], [0, 1, 'no'], [0, 1, 'no']]
     labels = ['no surfacing', 'flippers']
@@ -50,7 +51,7 @@ def chooseBestFeatureToSplit(dataset):
             prob = len(subDataSet)/float(len(dataset))
             newEntropy += prob * calcShannonEnt(subDataSet)
         infoGain = baseEntropy - newEntropy
-        print(infoGain)
+        #print(infoGain)
         if infoGain > bestInfoGain:
             bestInfoGain = infoGain
             bestFeature = i
@@ -85,6 +86,18 @@ def createTree(dataSet, labels):
     return myTree
 
 
+def classify(inputTree, featLabels, testVec):
+    firstStr = list(inputTree.keys())[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
 myDat, labels = createDataSet()
-print(myDat)
-print(createTree(myDat, labels))
+l = labels[:]
+myTree = createTree(myDat, labels)
+print(classify(myTree, l, [1, 1]))
