@@ -28,16 +28,16 @@ def gradAscent(dataMatIn, classLabels):
     m, n = shape(dataMatrix)
     alpha = 0.001
     maxCycles = 500
-    ws = ones((n, 1))
+    weights = ones((n, 1))
     for k in range(maxCycles):
         h = sigmoid(dataMatrix * weights)
         error = (labelMat - h)
-        ws = ws + alpha * dataMatrix.transpose() * error
+        weights = weights + alpha * dataMatrix.transpose() * error
     return weights
 
 def plotBestFit(wei):
     import matplotlib.pyplot as plt
-    weights = wei.getA()
+    #weights = wei.getA()
     dataMat, labelMat = loadDataSet()
     dataArr = array(dataMat)
     n = shape(dataArr)[0]
@@ -57,7 +57,7 @@ def plotBestFit(wei):
     ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
     ax.scatter(xcord2, ycord2, s=30, c='green')
     x = arange(-3.0, 3.0, 0.1)
-    y = (- weights[0] - weights[1]*x) / weights[2]
+    y = (- wei[0] - wei[1]*x) / wei[2]
     ax.plot(x, y)
     plt.xlabel('X1')
     plt.ylabel('X2')
@@ -67,13 +67,32 @@ def plotBestFit(wei):
 def stocGradAscent0(dataMatrix, classLabels):
     """随机梯度上升"""
     m, n = shape(dataMatrix)
+    #dataM = mat(dataMatrix)
     alpha = 0.01
-    weightss = ones(n)
+    weights = ones(n)
     for i in range(m):
-        h = sigmoid(sum(dataMatrix[i] * weightss))
+        h = sigmoid(sum(dataMatrix[i] * weights))
         error = classLabels[i] - h
-        weightss = weightss + alpha * error * dataMatrix[i]
-    return weightss
+        #print(alpha * error * array(dataMatrix[i]))
+        #print(weights, dataMatrix[i])
+        weights += alpha * error * array(dataMatrix[i])# should be array
+    return weights
+
+
+def stocGradAscent1(dataMatrix, classLabels, numInter=150):
+    m, n = shape(dataMatrix)
+    weights = ones(n)
+    for j in range(numInter):
+        dataIndex = list(range(m))
+        for i in range(m):
+            alpha = 4 / (1.0 + j + i) + 0.01
+            randIndex = int(random.uniform(0, len(dataIndex)))
+            h = sigmoid(sum(dataMatrix[randIndex] * weights))
+            error = classLabels[randIndex] - h
+            weights += alpha * error * array(dataMatrix[randIndex])
+            del(dataIndex[randIndex])
+    return weights
+
 dataArr, labelMat = loadDataSet()
-w = stocGradAscent0(dataArr, labelMat)
+w = stocGradAscent1(dataArr, labelMat)
 plotBestFit(w)
